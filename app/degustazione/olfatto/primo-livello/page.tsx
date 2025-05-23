@@ -1,67 +1,51 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+const sentori = {
+  ve: "Vegetale",
+  sp: "Speziato",
+  fr: "Frutta",
+  to: "Tostato",
+  fi: "Fiori",
+  le: "Legno",
+};
 
 export default function OlfattoPrimoLivello() {
-  const [selected, setSelected] = useState<string[]>([]);
-  const router = useRouter();
+  const [selezione, setSelezione] = useState<string | null>(null);
 
-  const sentori = ['Fruttato', 'Floreale', 'Vegetale', 'Speziato'];
+  useEffect(() => {
+    const ids = Object.keys(sentori);
 
-  const toggleSelection = (value: string) => {
-    setSelected((prev) =>
-      prev.includes(value)
-        ? prev.filter((s) => s !== value)
-        : [...prev, value]
-    );
-  };
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => setSelezione(id));
+      }
+    });
 
-  const handleNext = () => {
-    if (selected.length > 0) {
-      localStorage.setItem('olfatto_primo_livello', JSON.stringify(selected));
-      router.push('/degustazione/olfatto/secondo-livello');
-    }
-  };
+    return () => {
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.replaceWith(el.cloneNode(true));
+      });
+    };
+  }, []);
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <h1>Olfatto – Primo Livello</h1>
-      <p>Quali sentori principali percepisci?</p>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {sentori.map((s) => (
-          <li key={s}>
-            <button
-              onClick={() => toggleSelection(s)}
-              style={{
-                margin: '0.5rem 0',
-                padding: '0.5rem 1rem',
-                backgroundColor: selected.includes(s) ? '#a3e635' : '#e5e7eb',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              {s}
-            </button>
-          </li>
-        ))}
-      </ul>
-      <button
-        onClick={handleNext}
-        disabled={selected.length === 0}
-        style={{
-          marginTop: '1rem',
-          padding: '0.5rem 1rem',
-          backgroundColor: selected.length > 0 ? '#2563eb' : '#ccc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: selected.length > 0 ? 'pointer' : 'not-allowed',
-        }}
-      >
-        Avanti
-      </button>
-    </main>
+    <div className="flex flex-col items-center p-6">
+      <object
+        data="/file.svg"  // usa "/ruota-livello1.svg" se lo rinomini
+        type="image/svg+xml"
+        className="w-full max-w-md h-auto"
+      />
+      {selezione && (
+        <p className="mt-4 text-lg font-medium">
+          Hai selezionato: <strong>{sentori[selezione]}</strong> ({selezione})
+        </p>
+      )}
+    </div>
   );
 }
+
