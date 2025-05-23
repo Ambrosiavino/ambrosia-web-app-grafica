@@ -34,12 +34,12 @@ export default function OlfattoPrimoLivello() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <object
-  data="/livello-1.svg"
+<object
+  data="/ruota-livello1.svg"
   type="image/svg+xml"
   className="w-full max-w-md h-auto"
 />
+
 
       {selezione && (
         <p className="mt-4 text-lg font-medium">
