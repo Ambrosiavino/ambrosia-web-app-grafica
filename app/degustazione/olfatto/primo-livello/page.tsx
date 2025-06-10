@@ -1,52 +1,67 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-const sentori = {
-  ve: "Vegetale",
-  sp: "Speziato",
-  fr: "Frutta",
-  to: "Tostato",
-  fi: "Fiori",
-  le: "Legno",
-};
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { sentoriVino } from '../../../constants/sentoriVino';
 
 export default function OlfattoPrimoLivello() {
-  const [selezione, setSelezione] = useState<string | null>(null);
+  const router = useRouter();
+  const categorie = Object.keys(sentoriVino.rossi_e_rosati);
+  const [selezionati, setSelezionati] = useState<string[]>([]);
 
-  useEffect(() => {
-    const ids = Object.keys(sentori);
+  const toggle = (cat: string) => {
+    setSelezionati(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  };
 
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.cursor = 'pointer';
-        el.addEventListener('click', () => setSelezione(id));
-      }
-    });
-
-    return () => {
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.replaceWith(el.cloneNode(true));
-      });
-    };
-  }, []);
+  const handleNext = () => {
+    if (selezionati.length > 0) {
+      localStorage.setItem('olfatto_primo_livello', JSON.stringify(selezionati));
+      router.push('/degustazione/olfatto/secondo-livello');
+    }
+  };
 
   return (
-<object
-  data="/ruota-livello1.svg"
-  type="image/svg+xml"
-  className="w-full max-w-md h-auto"
-/>
-
-
-      {selezione && (
-        <p className="mt-4 text-lg font-medium">
-          Hai selezionato: <strong>{sentori[selezione]}</strong> ({selezione})
-        </p>
-      )}
-    </div>
+    <main style={{ padding: '2rem' }}>
+      <h1>Olfatto – Primo Livello</h1>
+      <p>Seleziona i sentori principali percepiti:</p>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {categorie.map(c => (
+          <li key={c}>
+            <button
+              onClick={() => toggle(c)}
+              style={{
+                margin: '0.5rem 0',
+                padding: '0.5rem 1rem',
+                backgroundColor: selezionati.includes(c) ? '#a3e635' : '#e5e7eb',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                width: '100%',
+                textAlign: 'left',
+              }}
+            >
+              {c}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <button
+        onClick={handleNext}
+        disabled={selezionati.length === 0}
+        style={{
+          marginTop: '1rem',
+          padding: '0.5rem 1rem',
+          backgroundColor: selezionati.length > 0 ? '#2563eb' : '#ccc',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: selezionati.length > 0 ? 'pointer' : 'not-allowed',
+        }}
+      >
+        Continua
+      </button>
+    </main>
   );
 }
-

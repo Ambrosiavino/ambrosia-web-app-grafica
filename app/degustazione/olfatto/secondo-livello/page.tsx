@@ -1,13 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { sentoriVino } from '../../../constants/sentoriVino';
 
 export default function OlfattoSecondoLivello() {
-  const [selected, setSelected] = useState<string[]>([]);
   const router = useRouter();
+  const [sentori, setSentori] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
-  const sentori = ['Pesca', 'Fragola', 'Erba tagliata', 'Agrumi', 'Miele'];
+  useEffect(() => {
+    const stored = localStorage.getItem('olfatto_primo_livello');
+    if (stored) {
+      try {
+        const categorie: string[] = JSON.parse(stored);
+        const arr: string[] = [];
+        categorie.forEach((cat) => {
+          const values = (sentoriVino.rossi_e_rosati as Record<string, string[]>)[cat];
+          if (values) arr.push(...values);
+        });
+        setSentori(arr);
+      } catch {
+        setSentori([]);
+      }
+    } else {
+      router.push('/degustazione/olfatto/primo-livello');
+    }
+  }, [router]);
 
   const toggleSelection = (value: string) => {
     setSelected((prev) =>
